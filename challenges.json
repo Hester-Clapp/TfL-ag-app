@@ -1,0 +1,194 @@
+[
+    {
+        "title": "Visit Heathrow",
+        "description": "Visit Heathrow Airport",
+        "latitude": 51.47246000948234,
+        "longitude": -0.4542524975546841,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Oh Deer!",
+        "description": "Find a deer in Richmond Park",
+        "latitude": 51.443303015373,
+        "longitude": -0.27502390380981884,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Walk across Tower Bridge",
+        "description": "Walk across Tower Bridge",
+        "latitude": 51.50553068383095,
+        "longitude": -0.07539404033778685,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Find a pride flag",
+        "description": "Find a pride flag",
+        "latitude": 0,
+        "longitude": 0,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Support the LGBTQ+ Community",
+        "description": "Support the LGBTQ+ community in some way",
+        "latitude": 0,
+        "longitude": 0,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "What's the time?",
+        "description": "Say 'bing bong bing bong' at the same time as Big Ben",
+        "latitude": 51.50082108733777,
+        "longitude": -0.12467101932532466,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Boo KCLMS",
+        "description": "Boo King's College London Maths School",
+        "latitude": 51.495887444323934,
+        "longitude": -0.1114983868358664,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Find something out of season",
+        "description": "Find something seasonal (e.g. Christmas, Easter",
+        "latitude": 0,
+        "longitude": 0,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Ride the cable cars",
+        "description": "Take a ride on the IFS Cloud cable car",
+        "latitude": 51.49975862096953,
+        "longitude": 0.008296039160658384,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Pretend to drive the DLR",
+        "description": "Sit at the front of a Docklands Light Railway train and pretend to drive it",
+        "latitude": 0,
+        "longitude": 0,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Anyone home?",
+        "description": "Visit another teammate's local station",
+        "latitude": 0,
+        "longitude": 0,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Masterwork",
+        "description": "Go to a gallery and draw a picture of something you find there",
+        "latitude": 0,
+        "longitude": 0,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Not My King",
+        "description": "Protest the monarchy outside Buckingham Palace",
+        "latitude": 51.501303477857356,
+        "longitude": -0.1418426278495369,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Royal Rings",
+        "description": "Eat 6 Haribo rings (or alternative) outside Hampton Court Palace",
+        "latitude": 51.40354309102985,
+        "longitude": -0.33894552518061954,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Secret Agent",
+        "description": "Pose with sunglasses outside MI6 HQ",
+        "latitude": 51.48755750098831,
+        "longitude": -0.12519690130277444,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Bon Voyage",
+        "description": "Wave to a Eurostar train and say 'Bon Voyage'. The train may be bound for London, Paris or Amsterdam, but it must be moving.",
+        "latitude": 51.53016946237229,
+        "longitude": -0.12506279691318134,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Tyrant Lizard",
+        "description": "Roar at a T-Rex at the National History Museum",
+        "latitude": 51.49654090026803,
+        "longitude": -0.17597563777527592,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Mathematician",
+        "description": "Solve a maths problem in the maths section of the Science Museum",
+        "latitude": 51.4972171486382,
+        "longitude": -0.17672785547370057,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Perform at the O2",
+        "description": "Perform something at the O2 Arena",
+        "latitude": 51.501558330619275,
+        "longitude": 0.00477999102277994,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "It's coming home!",
+        "description": "Play football at a football stadium. You may use anything as the ball.",
+        "latitude": 0,
+        "longitude": 0,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Olympic Sprinter",
+        "description": "Race your teammate outside the West Ham Olympic Stadium",
+        "latitude": 51.53865626259044,
+        "longitude": -0.016569431969735125,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Do something feminist on Waterloo Bridge",
+        "description": "Do something feminist on Waterloo Bridge",
+        "latitude": 51.50860025056449,
+        "longitude": -0.11692096024775218,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Zero Degrees",
+        "description": "Cross the Prime Meridian on foot",
+        "latitude": 51.47690439604195,
+        "longitude": 0,
+        "reward": 1,
+        "completed": false
+    },
+    {
+        "title": "Property Tycoon",
+        "description": "Visit a property found on the standard Monopoly board. These include Old Kent Road, Whitechapel Road, `The Angel` Islington, Euston Road, Pentonville Road, Pall Mall, Whitehall, Northumberland Avenue, Bow Street, Marlborough Street, Vine Street, The Strand, Fleet Street, Trafalgar Square, Leicester Square, Coventry Street, Piccadilly, Regent Street, Oxford Street, Bond Street, Park Lane and Mayfair.",
+        "latitude": 0,
+        "longitude": 0,
+        "reward": 1,
+        "completed": false
+    }
+]

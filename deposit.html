@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit | TfL-ag</title>
+    <link rel="stylesheet" href="/style">
+</head>
+
+<body>
+    <header>
+        <h1>Deposit Money</h1>
+        <a href="/" id="back">&#x2190 Back</a>
+    </header>
+    <div>
+        <h3>Your coins:</h3>
+        <textarea readonly id="coins">...</textarea>
+    </div>
+    <hr>
+
+</body>
+<script>
+    let teamData = JSON.parse(sessionStorage.getItem("teamData"))
+    document.getElementById("coins").value = teamData ? teamData.coins : "error"
+</script>
+
+</html>

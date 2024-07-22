@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In | TfL-ag</title>
+    <link rel="stylesheet" href="/style">
+</head>
+
+<body>
+    <header>
+        <h1>Log In</h1>
+    </header>
+    <h2></h2>
+    <div id="login">
+        <form>
+            <label for="team">Team:</label>
+            <input type="text" id="team" name="team" autocomplete="off" autocapitalize="on">
+            <input type="submit" value="Log In">
+        </form>
+    </div>
+</body>
+
+<script>
+    document.getElementById("team").value = localStorage.getItem("team") || ""
+    document.querySelector("form").onsubmit = async e => {
+        e.preventDefault()
+        // const formData = new FormData(document.querySelector("form"))
+        const response = await fetch("/login", {
+            method: "POST",
+            body: document.getElementById("team").value
+        }).then(async response => response.json())
+        // sessionStorage.setItem("id", json.sessionID)
+        localStorage.setItem("team", response.team)
+        window.location.href = "/"
+    }
+</script>
+
+</html>
