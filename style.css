@@ -33,8 +33,7 @@ a {
     border-radius: 1ch;
 }
 
-a:active,
-#back:active {
+a:active {
     color: #ffcd00;
 }
 
@@ -45,10 +44,16 @@ a:active,
     padding: 0.5rem 1ch;
     text-align: left;
     font-weight: bold;
-    box-shadow: none;
+    border: 1pt solid #019;
+    background-image: linear-gradient(#46f, #019);
+    color: white;
+    box-shadow: 0 0 1pt black, inset 0 0 1ch #019;
+    text-shadow: 0 1pt black;
 }
 
-div {
+div,
+ul.challenges {
+    display: block;
     width: 100%;
 }
 
@@ -86,4 +91,56 @@ textarea {
     border: 2pt solid black;
     border-radius: 1ch;
     box-shadow: 0.1ch 0.1ch 0.4ch 0.1ch black;
+}
+
+ul.challenges li {
+    width: 80%;
+    padding: 0;
+    margin-left: auto;
+    margin-right: auto;
+    list-style-type: none;
+    margin-bottom: 1rem;
+}
+
+ul.challenges button.collapsible,
+ul.challenges div {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 4pt;
+    text-align: left;
+    border: 1pt solid #7B868C;
+    box-shadow: 0 2pt#7B868C;
+    background-color: white;
+}
+
+ul.challenges button.collapsible:active,
+ul.challenges button.expanded {
+    box-shadow: none;
+}
+
+ul.challenges button.collapsible h3 {
+    margin: 4pt;
+    margin-bottom: 1rem;
+}
+
+ul.challenges div button {
+    display: block;
+    box-sizing: border-box;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1rem;
+    padding: 4pt;
+    border-radius: 1ch;
+    font-weight: bold;
+    border: 1pt solid #019;
+    background-image: linear-gradient(#46f, #019);
+    color: white;
+    box-shadow: inset 0 0 1ch #019;
+    text-shadow: 0 1pt black;
+}
+
+#back:active,
+ul.challenges div button:active {
+    background-image: linear-gradient(#019, #46f);
 }

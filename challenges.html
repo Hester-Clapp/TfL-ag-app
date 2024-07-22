@@ -18,26 +18,69 @@
         <textarea readonly id="coins">...</textarea>
     </div>
     <hr> -->
-    <h3 id="message">Fetching location...</h3>
-
+    <p id="message">Fetching location...</p>
+    <hr>
+    <h2>Nearby:</h2>
+    <ul id="loc-challenges" class="challenges">
+        Loading challenges...
+    </ul>
 </body>
 <script>
-    let location
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(
-                (position) => {
-                    document.getElementById("message").innerHTML = `Location last found at ${new Date(position.timestamp).toTimeString()}`
-                    location = position
+
+    // Get Location
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+            (position) => {
+                // Check if challenges are open
+                document.getElementById("message").innerHTML = `Location last found at ${new Date(position.timestamp).toTimeString().slice(0, 8)}`
+                if (![...document.querySelectorAll("button.collapsible")].some(v => v.classList.contains("expanded"))) {
+                    // Fetch challenges from server
+                    getChallenges(challenges => {
+
+                        challenges.locational.forEach(v => {
+                            v.distance = Math.hypot(position.coords.latitude - v.latitude, position.coords.longitude - v.longitude) * 111000
+                        })
+                        document.getElementById("loc-challenges").innerHTML = ""
+                        challenges.locational.filter(v => v.open).sort((a, b) => a.distance - b.distance).forEach(v => {
+                            document.getElementById("loc-challenges").innerHTML += `
+                        <li>
+                            <button class="collapsible">
+                                ${formatDistance(v.distance)}<br>
+                                <h3>${v.title}</h3>
+                                </button>
+                                <div style="display: none;">
+                                    ${v.description}<br>
+                                    <button>Claim ${v.reward} coins</button>
+                                </div>
+                                </li>
+                            `
+                        })
+
+                        // Animate Challenge Dropdowns
+                        document.querySelectorAll("button.collapsible").forEach(v => {
+                            v.addEventListener("click", () => {
+                                v.classList.toggle("expanded")
+                                v.nextElementSibling.style.display = v.classList.contains("expanded") ? "block" : "none"
+                            })
+                        })
+                    })
                 }
-            )
-        } else {
-            document.getElementById("message").innerHTML = "Geolocation not supported."
-        }
+            }
+        )
+    } else {
+        document.getElementById("message").innerHTML = "Geolocation not supported."
     }
-    console.log(getLocation())
-    // let teamData = JSON.parse(sessionStorage.getItem("teamData"))
-    // document.getElementById("coins").value = teamData ? teamData.coins : "error"
+    function formatDistance(distance, sigfigs = 2) {
+        let digits = Math.floor(Math.log10(distance))
+        distance = Math.round(distance * 10 ** (sigfigs - digits - 1)) * 10 ** (digits - sigfigs + 1)
+        if (digits < 3) return `${distance}m`
+        else return `${distance / 1000}km`
+    }
+
+    // Get Challenges
+    function getChallenges(callback) {
+        fetch("/challenges.json").then(res => res.json().then(callback))
+    }
 </script>
 
 </html>

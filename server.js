@@ -8,6 +8,7 @@ const pages = {
     "/challenges": "./challenges.html",
     "/steal": "./steal.html",
     "/style": "./style.css",
+    "/challenges.json": "./challenges.json",
 }
 
 const server = Bun.serve({
