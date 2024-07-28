@@ -12,26 +12,29 @@
     <header>
         <h1>Home</h1>
     </header>
-    <h2 id="welcome"></h2>
-    <hr>
-    <div>
-        <h3>Your coins:</h3>
-        <textarea readonly id="coins">...</textarea>
-    </div>
-    <hr>
-    <a href="/deposit">Deposit</a>
-    <a href="/challenges">Challenges</a>
-    <a href="/steal">Steal</a>
-    <hr>
-    <h2>Teams:</h2>
-    <table>
-        <tr>
-            <th>Team:</th>
-            <th>Coins:</th>
-            <th>Location:</th>
-        </tr>
-        <p>*list of teams fetched from server sorted by coins*</p>
-    </table>
+    <main>
+
+        <h2 id="welcome"></h2>
+        <hr>
+        <div>
+            <h3>Your coins:</h3>
+            <textarea readonly id="coins">...</textarea>
+        </div>
+        <hr>
+        <a href="/deposit">Deposit</a>
+        <a href="/challenges">Challenges</a>
+        <a href="/steal">Steal</a>
+        <hr>
+        <h2>Teams:</h2>
+        <table>
+            <tr>
+                <th>Team:</th>
+                <th>Coins:</th>
+                <th>Location:</th>
+            </tr>
+            <p>*list of teams fetched from server sorted by coins*</p>
+        </table>
+    </main>
 </body>
 <script>
     // Get team from local storage or log in

@@ -13,19 +13,22 @@
         <h1>Challenges</h1>
         <a href="/" id="back">&#x2190 Back</a>
     </header>
-    <!-- <div>
+    <main>
+        <!-- <div>
         <h3>Your coins:</h3>
         <textarea readonly id="coins">...</textarea>
     </div>
     <hr> -->
-    <p id="message">Fetching location...</p>
-    <hr>
-    <h2>Nearby:</h2>
-    <ul id="loc-challenges" class="challenges">
-        Loading challenges...
-    </ul>
+        <p id="message">Fetching location...</p>
+        <hr>
+        <h2>Nearby:</h2>
+        <ul id="loc-challenges" class="challenges">
+            Loading challenges...
+        </ul>
+    </main>
 </body>
 <script>
+    document.querySelector("main").style.width = window.visualViewport.width + "px"
 
     // Get Location
     if (navigator.geolocation) {
@@ -37,9 +40,7 @@
                     // Fetch challenges from server
                     getChallenges(challenges => {
 
-                        challenges.locational.forEach(v => {
-                            v.distance = Math.hypot(position.coords.latitude - v.latitude, position.coords.longitude - v.longitude) * 111000
-                        })
+                        challenges.locational.forEach(challenge => { challenge.distance = calculateDistance(position.coords, challenge) })
                         document.getElementById("loc-challenges").innerHTML = ""
                         challenges.locational.filter(v => v.open).sort((a, b) => a.distance - b.distance).forEach(v => {
                             document.getElementById("loc-challenges").innerHTML += `
@@ -70,6 +71,13 @@
     } else {
         document.getElementById("message").innerHTML = "Geolocation not supported."
     }
+
+    const metresPerDegreeEquator = 111120
+    function calculateDistance(obj1, obj2) {
+        return Math.hypot(obj1.latitude - obj2.latitude, (obj1.longitude - obj2.longitude) * Math.cos((obj1.latitude + obj2.latitude) * 90 / Math.PI)) * metresPerDegreeEquator
+    }
+
+
     function formatDistance(distance, sigfigs = 2) {
         let digits = Math.floor(Math.log10(distance))
         distance = Math.round(distance * 10 ** (sigfigs - digits - 1)) * 10 ** (digits - sigfigs + 1)
