@@ -11,7 +11,7 @@
 <body>
     <header>
         <h1>Challenges</h1>
-        <a href="/" id="back">&#x2190 Back</a>
+        <a href="/" id="back" class="blue button">&#x2190 Back</a>
     </header>
     <main>
         <!-- <div>
@@ -45,13 +45,15 @@
                         challenges.locational.filter(v => v.open).sort((a, b) => a.distance - b.distance).forEach(v => {
                             document.getElementById("loc-challenges").innerHTML += `
                         <li>
-                            <button class="collapsible">
+                            <button class="button collapsible">
                                 ${formatDistance(v.distance)}<br>
                                 <h3>${v.title}</h3>
                                 </button>
-                                <div style="display: none;">
-                                    ${v.description}<br>
-                                    <button>Claim ${v.reward} coins</button>
+                                <div>
+                                    <p>
+                                        ${v.description}<br>
+                                        <button class="blue button">Claim ${v.reward} coins</button>
+                                    </p>
                                 </div>
                                 </li>
                             `
@@ -61,7 +63,7 @@
                         document.querySelectorAll("button.collapsible").forEach(v => {
                             v.addEventListener("click", () => {
                                 v.classList.toggle("expanded")
-                                v.nextElementSibling.style.display = v.classList.contains("expanded") ? "block" : "none"
+                                // v.nextElementSibling.style.display = v.classList.contains("expanded") ? "block" : "none"
                             })
                         })
                     })
