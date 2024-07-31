@@ -45,11 +45,19 @@ a:active {
     margin: 0;
     padding: 0.5rem 1ch;
     text-align: left;
-    box-shadow: 0 6px #019, 0 5px 4px 4px black;
+    background-color: #019;
+    border-color: black;
+    box-shadow: 0 6px black;
+    /*, 0 5px 4px 4px black;*/
 }
 
 #back:active {
-    box-shadow: 0 2px #019, 0 1px 4px 2px black;
+    box-shadow: 0 2px black;
+    /*, 0 1px 4px 2px black;*/
+}
+
+p {
+    margin: 1rem 2ch;
 }
 
 div,
@@ -58,19 +66,31 @@ ul.challenges {
     width: 100%;
 }
 
-#login {
-    display: block;
-}
-
 form {
     display: inline-block;
-    width: fit-content;
-    text-align: center;
+    width: 80%;
+    /* text-align: center; */
 }
 
 form * {
     display: block;
     margin: 1rem;
+    font-size: large;
+}
+
+form .radio {
+    text-align: left;
+    margin-bottom: 2rem;
+}
+
+form .radio * {
+    display: inline;
+    vertical-align: middle;
+}
+
+form input[type=radio] {
+    width: 1rem;
+    height: 1rem;
 }
 
 form input {
@@ -79,10 +99,12 @@ form input {
 }
 
 form input[type=submit] {
-    display: inline-block;
+    display: inline;
+    padding: 0.5rem 3ch;
 }
 
-textarea {
+textarea,
+input[type=text] {
     display: block;
     padding: 0.5lh 1ch;
     margin: 1rem 15%;
@@ -95,7 +117,8 @@ textarea {
     resize: none;
 }
 
-#coins {
+#coins,
+#bank {
     font-size: 40px;
     /* font-weight: bold; */
     height: calc(2lh + 4px);
@@ -196,7 +219,8 @@ ul.challenges div button {
     text-align: center;
 }
 
-.button:active {
+button.button:active,
+a.button:active {
     transform: translate(0, 4px);
     box-shadow: 0 2px #7B868C;
     color: #ffcd00;

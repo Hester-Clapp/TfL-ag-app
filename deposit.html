@@ -11,21 +11,122 @@
 <body>
     <header>
         <h1>Deposit Money</h1>
-        <a href="/" id="back">&#x2190 Back</a>
+        <a href="/" id="back" class="blue button">&#x2190 Back</a>
     </header>
-    <div>
-        <h3>Your coins:</h3>
-        <textarea readonly id="coins">...</textarea>
-        <hr>
-        <p>*confirm location is near Bank of England*</p>
-        <p>*deposit coins UI*</p>
+    <p id="loc-message">Location disabled</p>
+    <div style="margin: 1rem 0">
+        <button class="blue button" style="display: inline;"
+            onclick="locationEnabled = !locationEnabled;this.classList.toggle('pressed', locationEnabled);this.innerHTML=locationEnabled?'Disable Location':'Enable Location'; getLocation()">Enable
+            Location</button>
+    </div>
+    <p id="bank-message">You must be near the Bank of England to deposit money</p>
+    <hr>
+    <div style="display: flex;">
+        <div>
+            <h3>Your coins:</h3>
+            <textarea readonly id="coins">...</textarea>
+        </div>
+        <div>
+            <h3>In bank:</h3>
+            <textarea readonly id="bank">...</textarea>
+        </div>
     </div>
     <hr>
+    <form>
+        <div class="radio">
+            <input type="radio" name="direction" id="deposit" value="1" checked
+                oninput="document.querySelector('input[type=submit]').value = 'Deposit'">
+            <label for="deposit">Deposit</label><br>
+            <input type="radio" name="direction" id="withdraw" value="-1"
+                oninput="document.querySelector('input[type=submit]').value = 'Withdraw'">
+            <label for="withdraw">Withdraw</label><br>
+        </div>
+        <label for="amount">Amount:</label>
+        <input type="text" id="amount" autocapitalize="off">
+        <input type="submit" class="blue button" value="Deposit">
+    </form>
 
 </body>
 <script>
     let teamData = JSON.parse(sessionStorage.getItem("teamData"))
     document.getElementById("coins").value = teamData ? teamData.coins : "error"
+    document.getElementById("bank").value = teamData ? teamData.bank : "error"
+
+    let locationEnabled = false
+    let watch, lastPosition
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            if (locationEnabled) {
+                watch = navigator.geolocation.watchPosition(
+                    position => {
+                        lastPosition = position
+                        if (locationEnabled) useLocation(position)
+                    },
+                    error => {
+                        locationEnabled = false
+                        document.getElementById("loc-message").innerHTML = "Failed to get location."
+                        document.getElementById("bank-message").innerHTML = "You must be near the Bank of England to deposit money"
+                    }
+                )
+            } else {
+                navigator.geolocation.clearWatch(watch)
+                useLocation()
+            }
+        } else {
+            locationEnabled = false
+            document.getElementById("loc-message").innerHTML = "Geolocation not supported."
+            document.getElementById("bank-message").innerHTML = "You must be near the Bank of England to deposit money"
+        }
+    }
+
+    function useLocation(position = lastPosition || {
+        timestamp: Date.now(),
+        coords: { latitude: 51.508045, longitude: -0.128217 } // Trafalgar Square
+    }) {
+        if (locationEnabled) {
+            document.getElementById("loc-message").innerHTML = `Location last found at ${new Date(position.timestamp).toTimeString().slice(0, 8)}`
+
+            // Calculate distance
+            let distance = calculateDistance(position.coords, { latitude: 51.51403237916926, longitude: -0.08835501645462154 })
+            document.querySelector("input[type=submit]").disabled = distance > 1000
+
+            if (distance < 1000) {
+                document.getElementById("bank-message").innerHTML = `You are ${formatDistance(distance)} away from the Bank. You can now deposit money!`
+            } else {
+                document.getElementById("bank-message").innerHTML = `You are ${formatDistance(distance)} away from the Bank. Please move closer to deposit money`
+            }
+        } else {
+            document.getElementById("loc-message").innerHTML = "Location disabled"
+            document.getElementById("bank-message").innerHTML = "You must be near the Bank of England to deposit money"
+            document.querySelector("input[type=submit]").disabled = false
+
+        }
+    }
+
+    document.querySelector("form").onsubmit = async e => {
+        e.preventDefault()
+        const response = await fetch("/deposit", {
+            method: "POST",
+            body: JSON.stringify({ team: localStorage.getItem("team"), amount: Number(document.querySelector("#amount").value) * Number(document.querySelector("input[name='direction']:checked").value) })
+        }).then(response => response.json())
+        console.log(response)
+        sessionStorage.setItem("teamData", JSON.stringify(response))
+        document.querySelector("#coins").value = response.coins
+        document.querySelector("#bank").value = response.bank
+    }
+
+    function calculateDistance(obj1, obj2) {
+        return Math.hypot(obj1.latitude - obj2.latitude, (obj1.longitude - obj2.longitude) * Math.cos((obj1.latitude + obj2.latitude) * 90 / Math.PI)) * 111120
+    }
+
+    function formatDistance(distance, sigfigs = 2) {
+        let digits = Math.floor(Math.log10(distance))
+        distance = Math.round(distance * 10 ** (sigfigs - digits - 1)) * 10 ** (digits - sigfigs + 1)
+        if (digits < 3) return `${distance}m`
+        else return `${distance / 1000}km`
+    }
+
 </script>
 
 </html>

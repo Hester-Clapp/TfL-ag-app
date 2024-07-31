@@ -20,9 +20,9 @@
     </div>
     <hr> -->
         <p id="message">Location disabled</p>
-        <div style="margin: 1rem 0; width: 100%; text-align: center;">
+        <div style="margin: 1rem 0">
             <button class="blue button" style="display: inline;"
-                onclick="useLocation = !useLocation;this.classList.toggle('pressed', useLocation);this.innerHTML=useLocation?'Disable Location':'Enable Location'; getLocation()">Enable
+                onclick="locationEnabled = !locationEnabled;this.classList.toggle('pressed', locationEnabled);this.innerHTML=locationEnabled?'Disable Location':'Enable Location'; getLocation()">Enable
                 Location</button>
         </div>
         <hr>
@@ -37,37 +37,37 @@
     </main>
 </body>
 <script>
-    let useLocation = false
-    let lastPosition
+    let locationEnabled = false
+    let watch, lastPosition
 
     function getLocation() {
         if (navigator.geolocation) {
-            if (useLocation) {
-                navigator.geolocation.watchPosition(
+            if (locationEnabled) {
+                watch = navigator.geolocation.watchPosition(
                     (position) => {
                         lastPosition = position
-                        if (useLocation) refreshResults(position)
+                        if (locationEnabled) useLocation(position)
                     },
                     (error) => {
-                        useLocation = false
+                        locationEnabled = false
                         document.getElementById("message").innerHTML = "Failed to get location."
                     }
                 )
             } else {
-                navigator.geolocation.clearWatch()
-                refreshResults()
+                navigator.geolocation.clearWatch(watch)
+                useLocation()
             }
         } else {
-            useLocation = false
+            locationEnabled = false
             document.getElementById("message").innerHTML = "Geolocation not supported."
         }
     }
 
-    function refreshResults(position = lastPosition || {
+    function useLocation(position = lastPosition || {
         timestamp: Date.now(),
         coords: { latitude: 51.508045, longitude: -0.128217 } // Trafalgar Square
     }) {
-        document.getElementById("message").innerHTML = useLocation ? `Location last found at ${new Date(position.timestamp).toTimeString().slice(0, 8)}` : "Location disabled"
+        document.getElementById("message").innerHTML = locationEnabled ? `Location last found at ${new Date(position.timestamp).toTimeString().slice(0, 8)}` : "Location disabled"
 
         // Check if challenges are open
         if (![...document.querySelectorAll("button.collapsible")].some(v => v.classList.contains("expanded"))) {
@@ -76,7 +76,7 @@
             getChallenges(challenges => {
 
                 // Make buttons for each locational challenge
-                if (useLocation) {
+                if (locationEnabled) {
                     challenges.locational.forEach(challenge => { challenge.distance = calculateDistance(position.coords, challenge) })
                     document.getElementById("loc-challenges").innerHTML = ""
                     challenges.locational.filter(v => v.open).sort((a, b) => a.distance - b.distance).forEach(makeChallenge)
@@ -102,11 +102,10 @@
         }
     }
 
-    refreshResults()
+    useLocation()
 
-    const metresPerDegreeEquator = 111120
     function calculateDistance(obj1, obj2) {
-        return Math.hypot(obj1.latitude - obj2.latitude, (obj1.longitude - obj2.longitude) * Math.cos((obj1.latitude + obj2.latitude) * 90 / Math.PI)) * metresPerDegreeEquator
+        return Math.hypot(obj1.latitude - obj2.latitude, (obj1.longitude - obj2.longitude) * Math.cos((obj1.latitude + obj2.latitude) * 90 / Math.PI)) * 111120
     }
 
     function formatDistance(distance, sigfigs = 2) {
@@ -126,7 +125,7 @@
     }
 
     function makeChallenge(challenge) {
-        const isLocational = challenge?.latitude && useLocation
+        const isLocational = challenge?.latitude && locationEnabled
         const li = addEl("li", document.querySelector(isLocational ? "#loc-challenges" : "#nonloc-challenges"))
         const button = addEl("button", li, { className: "button collapsible", innerHTML: isLocational ? formatDistance(challenge.distance) : "" })
         addEl("br", button)
@@ -135,8 +134,8 @@
         addEl("br", more)
         const claimButton = addEl("button", more, {
             className: "blue button",
-            innerHTML: challenge?.distance > 1000 && useLocation ? "Too far away" : `Claim ${challenge.reward} coins`,
-            disabled: challenge?.distance > 1000 && useLocation,
+            innerHTML: challenge?.distance > 1000 && locationEnabled ? "Too far away" : `Claim ${challenge.reward} coins`,
+            disabled: challenge?.distance > 1000 && locationEnabled,
             onclick: () => {
                 claimButton.innerHTML = "Are you sure?"
                 const yesButton = addEl("button", more, {
