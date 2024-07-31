@@ -3,11 +3,12 @@
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
+    box-sizing: border-box;
 }
 
 main {
-    width: 100%;
-    position: relative;
+    width: 100vw;
+    margin-bottom: 4rem;
 }
 
 header {
@@ -44,11 +45,11 @@ a:active {
     margin: 0;
     padding: 0.5rem 1ch;
     text-align: left;
-    box-shadow: 0 6pt #019, 0 5pt 4pt 4pt black;
+    box-shadow: 0 6px #019, 0 5px 4px 4px black;
 }
 
 #back:active {
-    box-shadow: 0 2pt #019, 0 1pt 4pt 2pt black;
+    box-shadow: 0 2px #019, 0 1px 4px 2px black;
 }
 
 div,
@@ -82,14 +83,45 @@ form input[type=submit] {
 }
 
 textarea {
-    font-size: 40pt;
-    font-weight: bold;
-    width: 50%;
-    height: 4rem;
-    padding: 1ch;
-    border: 2pt solid black;
-    border-radius: 1ch;
-    box-shadow: 0.1ch 0.1ch 0.4ch 0.1ch black;
+    display: block;
+    padding: 0.5lh 1ch;
+    margin: 1rem 15%;
+    border-radius: 1rem;
+    background-color: white;
+    border: 2px solid #7B868C;
+    box-shadow: 0 6px #7B868C;
+    width: 70%;
+    height: fit-content;
+    resize: none;
+}
+
+#coins {
+    font-size: 40px;
+    /* font-weight: bold; */
+    height: calc(2lh + 4px);
+}
+
+#activity {
+    height: 16rem;
+    overflow-y: scroll;
+}
+
+table {
+    width: 80%;
+    margin: 1rem 10%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 0.5rem 1ch;
+    border: 1px solid #7B868C;
+    width: max-content;
+}
+
+th {
+    background-color: #019;
+    color: white;
 }
 
 ul.challenges li {
@@ -121,10 +153,9 @@ ul.challenges div {
     transform: translate(0, -1.5rem);
     border-radius: 1rem;
     background-color: white;
-    border: 2pt solid #7B868C;
-    box-shadow: 0 2pt #7B868C;
+    border: 2px solid #7B868C;
+    box-shadow: 0 2px #7B868C;
     transition: padding 0.5s, grid-template-rows 0.5s, box-shadow 0.1s;
-    box-sizing: border-box;
     width: 100%;
     z-index: 0;
 }
@@ -143,33 +174,31 @@ ul.challenges div p {
 }
 
 ul.challenges button.collapsible h3 {
-    margin: 4pt;
+    margin: 4px;
     margin-bottom: 1rem;
 }
 
 ul.challenges div button {
     display: block;
-    box-sizing: border-box;
     width: 60%;
     margin: 1rem 20%;
 }
 
 .button {
     display: block;
-    box-sizing: border-box;
     padding: 2ch 0.5rem;
     border-radius: 1rem;
     font-weight: bold;
     background-color: white;
-    border: 2pt solid #7B868C;
-    box-shadow: 0 6pt #7B868C;
+    border: 2px solid #7B868C;
+    box-shadow: 0 6px #7B868C;
     transition: transform 0.1s, box-shadow 0.1s, background-color 0.3s;
     text-align: center;
 }
 
 .button:active {
-    transform: translate(0, 4pt);
-    box-shadow: 0 2pt #7B868C;
+    transform: translate(0, 4px);
+    box-shadow: 0 2px #7B868C;
     color: #ffcd00;
 }
 
@@ -179,27 +208,27 @@ ul.challenges div button {
 
 .button.blue {
     border-color: #019;
-    box-shadow: 0 6pt #019;
-    /* , inset 0 0 8pt -2pt #019 */
+    box-shadow: 0 6px #019;
+    /* , inset 0 0 8px -2px #019 */
     background-color: #005cb9;
     color: white;
-    text-shadow: 0 1pt 1pt black;
+    text-shadow: 0 1px 1px black;
 }
 
 .button.blue:active {
-    box-shadow: 0 2pt #019;
+    box-shadow: 0 2px #019;
     color: #ffcd00;
 }
 
 .button.blue.pressed {
-    transform: translate(0, 4pt);
-    box-shadow: 0 2pt #019;
+    transform: translate(0, 4px);
+    box-shadow: 0 2px #019;
 }
 
 .button.blue:disabled {
     border-color: #323e48;
-    box-shadow: 0 6pt #323e48;
+    box-shadow: 0 6px #323e48;
     background-color: #7B868C;
     color: white;
-    text-shadow: 0 1pt 1pt black;
+    text-shadow: 0 1px 1px black;
 }

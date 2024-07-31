@@ -14,23 +14,29 @@ const server = Bun.serve({
     async fetch(req) {
         const url = new URL(req.url)
         if (req.method === "POST") {
+            console.log(`Receiving POST request to ${url.pathname}`)
             if (url.pathname === "/login") {
                 const team = await req.text()
+                console.log(`Adding ${team} to database`)
                 editJSON("teams.json", teams => {
-                    teams[team] = teams?.[team] || {
-                        coins: 1000,
-                        bank: 0,
+                    if (!(team in teams)) {
+                        teams[team] = {
+                            coins: 1000,
+                            bank: 0,
+                        }
                     }
+                    console.log(teams)
                     return teams
                 })
                 return Response.json({ team });
             }
-            if (url.pathname === "/teamdata") {
-                const team = await req.text()
-                readJSON("teams.json", teams => {
-                    return Response.json(teams[team] || {})
-                })
-            }
+            // if (url.pathname === "/teamdata") {
+            //     const team = await req.text()
+            //     console.log(`from team ${team}`)
+            //     readJSON("teams.json", teams => {
+            //         return Response.json(teams[team] || {})
+            //     })
+            // }
             if (url.pathname === "/claim") {
                 const data = await req.text().then(text => JSON.parse(text))
                 if (data.team in teams) {
@@ -55,7 +61,7 @@ const server = Bun.serve({
         }
 
         if (req.method === "GET" && url.pathname in pages) {
-            console.log(url.pathname)
+            console.log(`Serving ${url.pathname}`)
             return new Response(Bun.file(pages[url.pathname]))
         }
 
@@ -65,4 +71,4 @@ const server = Bun.serve({
 console.log(`Server running on port ${server.port}`)
 
 async function readJSON(path, then) { Bun.file(path).json().then(then) }
-async function editJSON(path, edit) { Bun.file(path).json().then(json => { Bun.write(path, edit(json)) }) }
+async function editJSON(path, edit) { Bun.file(path).json().then(json => { Bun.write(path, JSON.stringify(edit(json))) }) }

@@ -28,14 +28,12 @@
         <h2>Activity:</h2>
         <textarea readonly id="activity"></textarea>
         <hr>
-        <h2>Teams:</h2>
-        <table>
+        <h2>Leaderboard</h2>
+        <table id="teamtable">
             <tr>
                 <th>Team:</th>
                 <th>Coins:</th>
-                <th>Location:</th>
             </tr>
-            <p>*list of teams fetched from server sorted by coins*</p>
         </table>
     </main>
 </body>
@@ -46,39 +44,42 @@
     document.getElementById("welcome").innerHTML = `Go team ${team}!`
 
     // Get data about all the teams
-
-    // function getChallenges(callback) { fetch("/challenges.json").then(res => res.json().then(callback)) }
     fetch("/teams.json").then(res => res.json().then(teams => {
-        console.log(teams)
-    }))
 
-    // Get player data from session storage or from server
-    let teamData = JSON.parse(sessionStorage.getItem("teamData"))
-    if (teamData) {
-        document.getElementById("coins").value = teamData.coins
-    } else {
-        async function getPlayerData() {
-            let response = await fetch(`/teamdata`, {
-                method: "POST",
-                body: team
-            }).then(async res => await res.json())
-            if (Object.keys(response).length) {
-                return response
-            } else {
-                await fetch(`/login`, {
-                    method: "POST",
-                    body: team
-                })
-                return getPlayerData()
+        // Get player data from session storage or from server
+        let teamData = JSON.parse(sessionStorage.getItem("teamData")) // See if it's in session storage
+        if (!teamData) {// If not use the teams object
+            if (team in teams) {
+                teamData = teams[team]
+            } else { // The server doesn't know about us - we need to authenticate
+                window.location.href = "/login"
             }
         }
-        getPlayerData().then(v => {
-            sessionStorage.setItem("teamData", JSON.stringify(v))
-            document.getElementById("coins").value = v.coins
+        sessionStorage.setItem("teamData", JSON.stringify(teamData))
+        document.getElementById("coins").innerHTML = teamData.coins
+
+        // Put the teams in an array
+        const teamArray = []
+        for (const team of Object.keys(teams)) {
+            teamArray.push({ name: team, ...teams[team] })
+        }
+
+        // Display team information
+        teamArray.sort((a, b) => b.coins - a.coins).forEach(team => {
+            const row = addEl("tr", document.getElementById("teamtable"))
+            addEl("td", row, { innerHTML: team.name })
+            addEl("td", row, { innerHTML: `${team.coins} + ${team.bank}` })
         })
+    }))
+
+    function addEl(type, parent, properties = {}) {
+        const el = document.createElement(type)
+        for (const k of Object.keys(properties)) {
+            el[k] = properties[k]
+        }
+        if (parent) parent.appendChild(el)
+        return el
     }
-
-
 </script>
 
 </html>

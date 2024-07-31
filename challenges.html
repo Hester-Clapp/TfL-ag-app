@@ -19,10 +19,10 @@
         <textarea readonly id="coins">...</textarea>
     </div>
     <hr> -->
-        <p id="message">Fetching location...</p>
+        <p id="message">Location disabled</p>
         <div style="margin: 1rem 0; width: 100%; text-align: center;">
             <button class="blue button" style="display: inline;"
-                onclick="useLocation = !useLocation;this.classList.toggle('pressed', !useLocation); refreshResults()">Disable
+                onclick="useLocation = !useLocation;this.classList.toggle('pressed', useLocation);this.innerHTML=useLocation?'Disable Location':'Enable Location'; getLocation()">Enable
                 Location</button>
         </div>
         <hr>
@@ -37,24 +37,30 @@
     </main>
 </body>
 <script>
-    let useLocation = true
+    let useLocation = false
     let lastPosition
 
-    // Get Location
-    if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-            (position) => {
-                lastPosition = position
-                if (useLocation) refreshResults(position)
-            },
-            (error) => {
-                useLocation = false
-                document.getElementById("message").innerHTML = "Failed to get location."
+    function getLocation() {
+        if (navigator.geolocation) {
+            if (useLocation) {
+                navigator.geolocation.watchPosition(
+                    (position) => {
+                        lastPosition = position
+                        if (useLocation) refreshResults(position)
+                    },
+                    (error) => {
+                        useLocation = false
+                        document.getElementById("message").innerHTML = "Failed to get location."
+                    }
+                )
+            } else {
+                navigator.geolocation.clearWatch()
+                refreshResults()
             }
-        )
-    } else {
-        useLocation = false
-        document.getElementById("message").innerHTML = "Geolocation not supported."
+        } else {
+            useLocation = false
+            document.getElementById("message").innerHTML = "Geolocation not supported."
+        }
     }
 
     function refreshResults(position = lastPosition || {
@@ -96,6 +102,8 @@
         }
     }
 
+    refreshResults()
+
     const metresPerDegreeEquator = 111120
     function calculateDistance(obj1, obj2) {
         return Math.hypot(obj1.latitude - obj2.latitude, (obj1.longitude - obj2.longitude) * Math.cos((obj1.latitude + obj2.latitude) * 90 / Math.PI)) * metresPerDegreeEquator
@@ -127,7 +135,7 @@
         addEl("br", more)
         const claimButton = addEl("button", more, {
             className: "blue button",
-            innerHTML: `Claim ${challenge.reward} coins`,
+            innerHTML: challenge?.distance > 1000 && useLocation ? "Too far away" : `Claim ${challenge.reward} coins`,
             disabled: challenge?.distance > 1000 && useLocation,
             onclick: () => {
                 claimButton.innerHTML = "Are you sure?"
