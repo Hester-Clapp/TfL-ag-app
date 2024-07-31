@@ -25,6 +25,9 @@
         <a href="/challenges" class="button">Challenges</a>
         <a href="/steal" class="button">Steal</a>
         <hr>
+        <h2>Activity:</h2>
+        <textarea readonly id="activity"></textarea>
+        <hr>
         <h2>Teams:</h2>
         <table>
             <tr>
@@ -42,11 +45,20 @@
     if (!team) window.location.href = "/login"
     document.getElementById("welcome").innerHTML = `Go team ${team}!`
 
+    // Get data about all the teams
+
+    // function getChallenges(callback) { fetch("/challenges.json").then(res => res.json().then(callback)) }
+    fetch("/teams.json").then(res => res.json().then(teams => {
+        console.log(teams)
+    }))
+
     // Get player data from session storage or from server
     let teamData = JSON.parse(sessionStorage.getItem("teamData"))
-    if (!teamData) {
+    if (teamData) {
+        document.getElementById("coins").value = teamData.coins
+    } else {
         async function getPlayerData() {
-            let response = await fetch(`/data`, {
+            let response = await fetch(`/teamdata`, {
                 method: "POST",
                 body: team
             }).then(async res => await res.json())
@@ -64,9 +76,8 @@
             sessionStorage.setItem("teamData", JSON.stringify(v))
             document.getElementById("coins").value = v.coins
         })
-    } else {
-        document.getElementById("coins").value = teamData.coins
     }
+
 
 </script>
 

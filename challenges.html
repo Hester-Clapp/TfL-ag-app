@@ -20,65 +20,86 @@
     </div>
     <hr> -->
         <p id="message">Fetching location...</p>
+        <div style="margin: 1rem 0; width: 100%; text-align: center;">
+            <button class="blue button" style="display: inline;"
+                onclick="useLocation = !useLocation;this.classList.toggle('pressed', !useLocation); refreshResults()">Disable
+                Location</button>
+        </div>
         <hr>
         <h2>Nearby:</h2>
         <ul id="loc-challenges" class="challenges">
             Loading challenges...
         </ul>
+        <h2>Other Challenges:</h2>
+        <ul id="nonloc-challenges" class="challenges">
+            Loading challenges...
+        </ul>
     </main>
 </body>
 <script>
-    document.querySelector("main").style.width = window.visualViewport.width + "px"
+    let useLocation = true
+    let lastPosition
 
     // Get Location
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
             (position) => {
-                // Check if challenges are open
-                document.getElementById("message").innerHTML = `Location last found at ${new Date(position.timestamp).toTimeString().slice(0, 8)}`
-                if (![...document.querySelectorAll("button.collapsible")].some(v => v.classList.contains("expanded"))) {
-                    // Fetch challenges from server
-                    getChallenges(challenges => {
-
-                        challenges.locational.forEach(challenge => { challenge.distance = calculateDistance(position.coords, challenge) })
-                        document.getElementById("loc-challenges").innerHTML = ""
-                        challenges.locational.filter(v => v.open).sort((a, b) => a.distance - b.distance).forEach(v => {
-                            document.getElementById("loc-challenges").innerHTML += `
-                        <li>
-                            <button class="button collapsible">
-                                ${formatDistance(v.distance)}<br>
-                                <h3>${v.title}</h3>
-                                </button>
-                                <div>
-                                    <p>
-                                        ${v.description}<br>
-                                        <button class="blue button">Claim ${v.reward} coins</button>
-                                    </p>
-                                </div>
-                                </li>
-                            `
-                        })
-
-                        // Animate Challenge Dropdowns
-                        document.querySelectorAll("button.collapsible").forEach(v => {
-                            v.addEventListener("click", () => {
-                                v.classList.toggle("expanded")
-                                // v.nextElementSibling.style.display = v.classList.contains("expanded") ? "block" : "none"
-                            })
-                        })
-                    })
-                }
+                lastPosition = position
+                if (useLocation) refreshResults(position)
+            },
+            (error) => {
+                useLocation = false
+                document.getElementById("message").innerHTML = "Failed to get location."
             }
         )
     } else {
+        useLocation = false
         document.getElementById("message").innerHTML = "Geolocation not supported."
+    }
+
+    function refreshResults(position = lastPosition || {
+        timestamp: Date.now(),
+        coords: { latitude: 51.508045, longitude: -0.128217 } // Trafalgar Square
+    }) {
+        document.getElementById("message").innerHTML = useLocation ? `Location last found at ${new Date(position.timestamp).toTimeString().slice(0, 8)}` : "Location disabled"
+
+        // Check if challenges are open
+        if (![...document.querySelectorAll("button.collapsible")].some(v => v.classList.contains("expanded"))) {
+
+            // Fetch challenges from server
+            getChallenges(challenges => {
+
+                // Make buttons for each locational challenge
+                if (useLocation) {
+                    challenges.locational.forEach(challenge => { challenge.distance = calculateDistance(position.coords, challenge) })
+                    document.getElementById("loc-challenges").innerHTML = ""
+                    challenges.locational.filter(v => v.open).sort((a, b) => a.distance - b.distance).forEach(makeChallenge)
+
+                    // Make buttons for each non-locational challenge
+                    document.getElementById("nonloc-challenges").innerHTML = ""
+                    challenges.nonlocational.filter(v => v.open).forEach(makeChallenge)
+                } else {
+                    // Make buttons for all challenges
+                    document.getElementById("loc-challenges").innerHTML = "Location disabled"
+                    document.getElementById("nonloc-challenges").innerHTML = ""
+                    challenges.locational.concat(challenges.nonlocational).filter(challenge => challenge.open).forEach(makeChallenge)
+                }
+
+                // Animate Challenge Dropdowns
+                document.querySelectorAll("button.collapsible").forEach(v => {
+                    v.addEventListener("click", () => {
+                        v.classList.toggle("expanded")
+                        // v.nextElementSibling.style.display = v.classList.contains("expanded") ? "block" : "none"
+                    })
+                })
+            })
+        }
     }
 
     const metresPerDegreeEquator = 111120
     function calculateDistance(obj1, obj2) {
         return Math.hypot(obj1.latitude - obj2.latitude, (obj1.longitude - obj2.longitude) * Math.cos((obj1.latitude + obj2.latitude) * 90 / Math.PI)) * metresPerDegreeEquator
     }
-
 
     function formatDistance(distance, sigfigs = 2) {
         let digits = Math.floor(Math.log10(distance))
@@ -87,10 +108,72 @@
         else return `${distance / 1000}km`
     }
 
-    // Get Challenges
-    function getChallenges(callback) {
-        fetch("/challenges.json").then(res => res.json().then(callback))
+    function addEl(type, parent, properties = {}) {
+        const el = document.createElement(type)
+        for (const k of Object.keys(properties)) {
+            el[k] = properties[k]
+        }
+        if (parent) parent.appendChild(el)
+        return el
     }
+
+    function makeChallenge(challenge) {
+        const isLocational = challenge?.latitude && useLocation
+        const li = addEl("li", document.querySelector(isLocational ? "#loc-challenges" : "#nonloc-challenges"))
+        const button = addEl("button", li, { className: "button collapsible", innerHTML: isLocational ? formatDistance(challenge.distance) : "" })
+        addEl("br", button)
+        addEl("h3", button, { innerHTML: challenge.title })
+        const more = addEl("p", addEl("div", li), { innerHTML: challenge.description })
+        addEl("br", more)
+        const claimButton = addEl("button", more, {
+            className: "blue button",
+            innerHTML: `Claim ${challenge.reward} coins`,
+            disabled: challenge?.distance > 1000 && useLocation,
+            onclick: () => {
+                claimButton.innerHTML = "Are you sure?"
+                const yesButton = addEl("button", more, {
+                    className: "blue button",
+                    innerHTML: "Yes",
+                    disabled: true,
+                })
+                const noButton = addEl("button", more, {
+                    className: "button",
+                    innerHTML: "No",
+                    onclick: () => {
+                        claimButton.innerHTML = `Claim ${challenge.reward} coins`
+                        yesButton.remove()
+                        noButton.remove()
+                    }
+                })
+                setTimeout(() => {
+                    yesButton.disabled = false
+                    yesButton.onclick = async () => {
+                        yesButton.innerHTML = "Please wait..."
+                        const response = await fetch("/claim", {
+                            method: "POST",
+                            body: JSON.stringify({ challenge: challenge.title, team: localStorage.getItem("team") || "" })
+                        })
+                        claimButton.innerHTML = await response.text()
+                        if (response.status === 200) {
+                            claimButton.disabled = true
+                            yesButton.remove()
+                            noButton.remove()
+                        }
+                        if (response.status === 401) {
+                            sessionStorage.clear()
+                            setTimeout(() => { window.location.href = "/login" }, 1000)
+                        }
+                    }
+                }, 1000)
+            }
+        })
+        addEl("br", more)
+    }
+
+
+
+    // Get Challenges
+    function getChallenges(callback) { fetch("/challenges.json").then(res => res.json().then(callback)) }
 </script>
 
 </html>

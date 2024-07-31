@@ -44,11 +44,11 @@ a:active {
     margin: 0;
     padding: 0.5rem 1ch;
     text-align: left;
-    box-shadow: 0 6pt #019, 0 5pt 4pt 2pt black, inset 0 0 8pt -2pt #019;
+    box-shadow: 0 6pt #019, 0 5pt 4pt 4pt black;
 }
 
 #back:active {
-    box-shadow: 0 2pt #019, 0 1pt 4pt 2pt black, inset 0 0 8pt -4pt #019;
+    box-shadow: 0 2pt #019, 0 1pt 4pt 2pt black;
 }
 
 div,
@@ -102,7 +102,7 @@ ul.challenges li {
     position: relative;
 }
 
-ul.challenges button {
+ul.challenges>li>button {
     position: relative;
     width: 100%;
     text-align: left;
@@ -136,7 +136,7 @@ ul.challenges button.expanded+div {
 }
 
 
-ul.challenges div>p {
+ul.challenges div p {
     overflow-y: hidden;
     text-align: left;
     font-weight: bold;
@@ -163,7 +163,8 @@ ul.challenges div button {
     background-color: white;
     border: 2pt solid #7B868C;
     box-shadow: 0 6pt #7B868C;
-    transition: transform 0.1s, box-shadow 0.1s;
+    transition: transform 0.1s, box-shadow 0.1s, background-color 0.3s;
+    text-align: center;
 }
 
 .button:active {
@@ -172,15 +173,33 @@ ul.challenges div button {
     color: #ffcd00;
 }
 
+.button:disabled:active {
+    transform: none;
+}
+
 .button.blue {
     border-color: #019;
-    box-shadow: 0 6pt #019, inset 0 0 8pt -2pt #019;
-    background-color: #46f;
+    box-shadow: 0 6pt #019;
+    /* , inset 0 0 8pt -2pt #019 */
+    background-color: #005cb9;
     color: white;
     text-shadow: 0 1pt 1pt black;
 }
 
 .button.blue:active {
-    box-shadow: 0 2pt #019, inset 0 0 8pt -4pt #019;
+    box-shadow: 0 2pt #019;
     color: #ffcd00;
+}
+
+.button.blue.pressed {
+    transform: translate(0, 4pt);
+    box-shadow: 0 2pt #019;
+}
+
+.button.blue:disabled {
+    border-color: #323e48;
+    box-shadow: 0 6pt #323e48;
+    background-color: #7B868C;
+    color: white;
+    text-shadow: 0 1pt 1pt black;
 }

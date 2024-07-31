@@ -17,12 +17,13 @@
         <form>
             <label for="team">Team:</label>
             <input type="text" id="team" name="team" autocomplete="off" autocapitalize="on">
-            <input type="submit" value="Log In">
+            <input type="submit" value="Log In" class="blue button">
         </form>
     </div>
 </body>
 
 <script>
+    sessionStorage.clear()
     document.getElementById("team").value = localStorage.getItem("team") || ""
     document.querySelector("form").onsubmit = async e => {
         e.preventDefault()
@@ -31,7 +32,7 @@
             body: document.getElementById("team").value
         }).then(async response => response.json())
         localStorage.setItem("team", response.team)
-        window.location.href = "/"
+        history.back()
     }
 </script>
 
