@@ -11,7 +11,10 @@
 <body>
     <header>
         <h1>Deposit Money</h1>
-        <a href="/" id="back" class="blue button">&#x2190 Back</a>
+        <div id="nav">
+            <a href="javascript: history.back()" class="blue button">&#x2190 Back</a>
+            <a href="/" class="blue button">Home</a>
+        </div>
     </header>
     <p id="loc-message">Location disabled</p>
     <div style="margin: 1rem 0">
@@ -110,7 +113,6 @@
             method: "POST",
             body: JSON.stringify({ team: localStorage.getItem("team"), amount: Number(document.querySelector("#amount").value) * Number(document.querySelector("input[name='direction']:checked").value) })
         }).then(response => response.json())
-        console.log(response)
         sessionStorage.setItem("teamData", JSON.stringify(response))
         document.querySelector("#coins").value = response.coins
         document.querySelector("#bank").value = response.bank

@@ -11,14 +11,12 @@
 <body>
     <header>
         <h1>Challenges</h1>
-        <a href="/" id="back" class="blue button">&#x2190 Back</a>
+        <div id="nav">
+            <a href="javascript: history.back()" class="blue button">&#x2190 Back</a>
+            <a href="/" class="blue button">Home</a>
+        </div>
     </header>
     <main>
-        <!-- <div>
-        <h3>Your coins:</h3>
-        <textarea readonly id="coins">...</textarea>
-    </div>
-    <hr> -->
         <p id="message">Location disabled</p>
         <div style="margin: 1rem 0">
             <button class="blue button" style="display: inline;"
@@ -27,11 +25,11 @@
         </div>
         <hr>
         <h2>Nearby:</h2>
-        <ul id="loc-challenges" class="challenges">
+        <ul id="loc-challenges" class="buttonlist">
             Loading challenges...
         </ul>
         <h2>Other Challenges:</h2>
-        <ul id="nonloc-challenges" class="challenges">
+        <ul id="nonloc-challenges" class="buttonlist">
             Loading challenges...
         </ul>
     </main>
@@ -137,41 +135,47 @@
             innerHTML: challenge?.distance > 1000 && locationEnabled ? "Too far away" : `Claim ${challenge.reward} coins`,
             disabled: challenge?.distance > 1000 && locationEnabled,
             onclick: () => {
-                claimButton.innerHTML = "Are you sure?"
-                const yesButton = addEl("button", more, {
-                    className: "blue button",
-                    innerHTML: "Yes",
-                    disabled: true,
-                })
-                const noButton = addEl("button", more, {
-                    className: "button",
-                    innerHTML: "No",
-                    onclick: () => {
-                        claimButton.innerHTML = `Claim ${challenge.reward} coins`
-                        yesButton.remove()
-                        noButton.remove()
-                    }
-                })
-                setTimeout(() => {
-                    yesButton.disabled = false
-                    yesButton.onclick = async () => {
-                        yesButton.innerHTML = "Please wait..."
-                        const response = await fetch("/claim", {
-                            method: "POST",
-                            body: JSON.stringify({ challenge: challenge.title, team: localStorage.getItem("team") || "" })
-                        })
-                        claimButton.innerHTML = await response.text()
-                        if (response.status === 200) {
-                            claimButton.disabled = true
+                if (!claimButton.classList.contains("clicked")) {
+                    claimButton.classList.add("clicked")
+                    claimButton.innerHTML = "Are you sure?"
+                    const yesButton = addEl("button", more, {
+                        className: "blue button",
+                        innerHTML: "Yes",
+                        disabled: true,
+                    })
+                    const noButton = addEl("button", more, {
+                        className: "button",
+                        innerHTML: "No",
+                        onclick: () => {
+                            claimButton.classList.remove("clicked")
+                            claimButton.innerHTML = `Claim ${challenge.reward} coins`
                             yesButton.remove()
                             noButton.remove()
                         }
-                        if (response.status === 401) {
-                            sessionStorage.clear()
-                            setTimeout(() => { window.location.href = "/login" }, 1000)
+                    })
+                    setTimeout(() => {
+                        yesButton.disabled = false
+                        yesButton.onclick = async () => {
+                            claimButton.classList.remove("clicked")
+                            yesButton.innerHTML = "Please wait..."
+                            const response = await fetch("/claim", {
+                                method: "POST",
+                                body: JSON.stringify({ challenge: challenge.title, team: localStorage.getItem("team") || "" })
+                            })
+                            claimButton.innerHTML = await response.text()
+                            if (response.status === 200) {
+                                claimButton.disabled = true
+                                yesButton.remove()
+                                noButton.remove()
+                                setTimeout(() => li.remove(), 2000)
+                            }
+                            if (response.status === 401) {
+                                sessionStorage.clear()
+                                setTimeout(() => { window.location.href = "/login" }, 1000)
+                            }
                         }
-                    }
-                }, 1000)
+                    }, 1000)
+                }
             }
         })
         addEl("br", more)

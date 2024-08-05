@@ -4,41 +4,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steals | TfL-ag</title>
+    <title>Shop | TfL-ag</title>
     <link rel="stylesheet" href="/style">
 </head>
 
 <body>
     <header>
-        <h1>Steals</h1>
+        <h1>Buy Steal Tokens</h1>
         <div id="nav">
             <a href="javascript: history.back()" class="blue button">&#x2190 Back</a>
             <a href="/" class="blue button">Home</a>
         </div>
     </header>
     <main>
-        <h2>Your Steal Tokens:</h2>
-        <ul id="steals" class="buttonlist">
-            Loading steals...
+        <div>
+            <h3>Your coins:</h3>
+            <textarea readonly id="coins">...</textarea>
+        </div>
+        <hr>
+        <h2>Steal Tokens</h2>
+        <ul id="tokens" class="buttonlist">
+            Loading tokens...
         </ul>
-        <a href="/shop" class="blue button">Buy Steal Tokens</a>
     </main>
+
+    <hr>
 </body>
 <script>
-    // Get team
     let team = localStorage.getItem("team")
+    let teamData = JSON.parse(sessionStorage.getItem("teamData"))
+    document.getElementById("coins").value = teamData ? teamData.coins : "error"
 
     function listSteals() {
         // If none are open
         if (![...document.querySelectorAll("button.collapsible")].some(v => v.classList.contains("expanded"))) {
-            document.getElementById("steals").innerHTML = ""
-            fetch("/steals.json").then(res => res.json()).then(steals => steals.filter(steal => steal.owner === team).forEach(makeSteal)).then(() => {
-                if (!document.getElementById("steals").innerHTML) document.getElementById("steals").innerHTML = "You don't have any steal tokens"
+            document.getElementById("tokens").innerHTML = ""
+            fetch("/steals.json").then(res => res.json()).then(steals => steals.filter(steal => steal.owner === "").forEach(makeSteal)).then(() => {
                 // Animate Steal Dropdowns
                 document.querySelectorAll("button.collapsible").forEach(v => { v.addEventListener("click", () => { v.classList.toggle("expanded") }) })
             })
         }
-
     }
 
     listSteals()
@@ -53,18 +58,18 @@
     }
 
     function makeSteal(steal) {
-        const li = addEl("li", document.getElementById("steals"))
-        const button = addEl("button", li, { className: "collapsible button" })
+        const li = addEl("li", document.getElementById("tokens"))
+        const button = addEl("button", li, { className: "button collapsible", innerHTML: `${steal.cost} coins` })
         addEl("h3", button, { innerHTML: steal.title })
         const more = addEl("p", addEl("div", li), { innerHTML: `On activation, all teams must <i>${steal.desc}</i> in ${steal.time} minutes, or otherwise pay you ${steal["%"] * 100}% of their money` })
         addEl("br", more)
-        const activateButton = addEl("button", more, {
+        const purchaseButton = addEl("button", more, {
             className: "blue button",
-            innerHTML: "Activate Steal",
+            innerHTML: "Purchase Token",
             onclick: () => {
-                if (!activateButton.classList.contains("clicked")) {
-                    activateButton.classList.add("clicked")
-                    activateButton.innerHTML = "Are you sure?"
+                if (!purchaseButton.classList.contains("clicked")) {
+                    purchaseButton.classList.add("clicked")
+                    purchaseButton.innerHTML = "Are you sure?"
                     const yesButton = addEl("button", more, {
                         className: "blue button",
                         innerHTML: "Yes",
@@ -74,8 +79,8 @@
                         className: "button",
                         innerHTML: "No",
                         onclick: () => {
-                            activateButton.classList.remove("clicked")
-                            activateButton.innerHTML = `Activate`
+                            purchaseButton.classList.remove("clicked")
+                            purchaseButton.innerHTML = `Purchase Token`
                             yesButton.remove()
                             noButton.remove()
                         }
@@ -83,17 +88,21 @@
                     setTimeout(() => {
                         yesButton.disabled = false
                         yesButton.onclick = async () => {
-                            activateButton.classList.remove("clicked")
+                            purchaseButton.classList.remove("clicked")
                             yesButton.innerHTML = "Please wait..."
-                            const response = await fetch("/activate_steal", {
+                            const response = await fetch("/purchase_token", {
                                 method: "POST",
                                 body: JSON.stringify({ steal: steal.title, team: localStorage.getItem("team") || "" })
                             })
-                            activateButton.innerHTML = await response.text()
+                            purchaseButton.innerHTML = await response.text()
                             if (response.status === 200) {
-                                activateButton.disabled = true
+                                purchaseButton.disabled = true
+                                teamData.coins -= steal.cost
+                                document.getElementById("coins").value = teamData.coins
+                                sessionStorage.setItem("teamData", JSON.stringify(teamData))
                                 yesButton.remove()
                                 noButton.remove()
+                                setTimeout(() => li.remove(), 2000)
                             }
                             if (response.status === 401) {
                                 sessionStorage.clear()
@@ -107,7 +116,6 @@
         // addEl("br", more)
         addEl("br", button)
     }
-
 </script>
 
 </html>

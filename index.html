@@ -24,6 +24,7 @@
         <a href="/deposit" class="button">Deposit</a>
         <a href="/challenges" class="button">Challenges</a>
         <a href="/steal" class="button">Steal</a>
+        <button id="logout" class="blue button">Log Out</button>
         <hr>
         <h2>Activity:</h2>
         <textarea readonly id="activity"></textarea>
@@ -42,6 +43,12 @@
     const team = localStorage.getItem("team")
     if (!team) window.location.href = "/login"
     document.getElementById("welcome").innerHTML = `Go team ${team}!`
+
+    // Logout functionality
+    document.getElementById("logout").onclick = () => {
+        localStorage.removeItem("team")
+        window.location.href = "/login"
+    }
 
     // Get data about all the teams
     fetch("/teams.json").then(res => res.json().then(teams => {
@@ -71,6 +78,9 @@
             addEl("td", row, { innerHTML: `${team.coins} + ${team.bank}` })
         })
     }))
+
+    // Get all recent activity
+    fetch("/log.json").then(res => res.json()).then(log => document.getElementById("activity").value = log.join("\n"))
 
     function addEl(type, parent, properties = {}) {
         const el = document.createElement(type)

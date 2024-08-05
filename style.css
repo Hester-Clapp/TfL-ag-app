@@ -39,10 +39,15 @@ a:active {
     color: #ffcd00;
 }
 
-#back {
+#nav {
+    display: flex;
+}
+
+#nav>a {
     color: white;
     width: fit-content;
     margin: 0;
+    margin-right: 2ch;
     padding: 0.5rem 1ch;
     text-align: left;
     background-color: #019;
@@ -51,7 +56,7 @@ a:active {
     /*, 0 5px 4px 4px black;*/
 }
 
-#back:active {
+#nav>a:active {
     box-shadow: 0 2px black;
     /*, 0 1px 4px 2px black;*/
 }
@@ -61,7 +66,7 @@ p {
 }
 
 div,
-ul.challenges {
+ul.buttonlist {
     display: block;
     width: 100%;
 }
@@ -127,6 +132,11 @@ input[type=text] {
 #activity {
     height: 16rem;
     overflow-y: scroll;
+    text-align: left;
+}
+
+#logout {
+    margin: 1rem auto;
 }
 
 table {
@@ -147,7 +157,7 @@ th {
     color: white;
 }
 
-ul.challenges li {
+ul.buttonlist li {
     width: 80%;
     padding: 0;
     margin-left: 10%;
@@ -157,18 +167,18 @@ ul.challenges li {
     position: relative;
 }
 
-ul.challenges>li>button {
+ul.buttonlist li>button {
     position: relative;
     width: 100%;
     text-align: left;
     z-index: 1;
 }
 
-ul.challenges button.expanded {
+ul.buttonlist button.expanded {
     box-shadow: 0 0.1rem #7B868C;
 }
 
-ul.challenges div {
+ul.buttonlist div {
     display: grid;
     position: relative;
     grid-template-rows: 0fr;
@@ -183,25 +193,26 @@ ul.challenges div {
     z-index: 0;
 }
 
-ul.challenges button.expanded+div {
+ul.buttonlist button.expanded+div {
     padding: 1rem 2ch;
     padding-top: 2rem;
     grid-template-rows: 1fr;
 }
 
 
-ul.challenges div p {
+ul.buttonlist div p {
     overflow-y: hidden;
     text-align: left;
     font-weight: bold;
+    margin: 0;
 }
 
-ul.challenges button.collapsible h3 {
+ul.buttonlist button.collapsible h3 {
     margin: 4px;
     margin-bottom: 1rem;
 }
 
-ul.challenges div button {
+ul.buttonlist div button {
     display: block;
     width: 60%;
     margin: 1rem 20%;
