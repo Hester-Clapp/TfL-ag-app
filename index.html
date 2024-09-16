@@ -21,6 +21,7 @@
             <textarea readonly id="coins">...</textarea>
         </div>
         <hr>
+        <button id="notif" class="blue button">Enable Steal Notifications</button>
         <a href="/deposit" class="button">Deposit</a>
         <a href="/challenges" class="button">Challenges</a>
         <a href="/steal" class="button">Steal</a>
@@ -43,6 +44,26 @@
     const team = localStorage.getItem("team")
     if (!team) window.location.href = "/login"
     document.getElementById("welcome").innerHTML = `Go team ${team}!`
+
+    // Ask for notifications
+    const notif = document.getElementById("notif")
+    if (Notification.permission === "granted") {
+        notif.classList.add("pressed")
+        notif.innerHTML = "Disable Steal Notifications"
+    }
+    notif.addEventListener("click", async () => {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                notif.classList.add("pressed")
+                notif.innerHTML = "Disable Steal Notifications"
+            } else {
+                notif.classList.remove("pressed")
+                notif.innerHTML = "Enable Steal Notifications"
+            }
+        })
+    })
+
+
 
     // Logout functionality
     document.getElementById("logout").onclick = () => {

@@ -57,7 +57,7 @@
         const button = addEl("button", li, { className: "collapsible button" })
         addEl("h3", button, { innerHTML: steal.title })
         const more = addEl("p", addEl("div", li), { innerHTML: `On activation, all teams must <i>${steal.desc}</i> in ${steal.time} minutes, or otherwise pay you ${steal["%"] * 100}% of their money` })
-        addEl("br", more)
+        // addEl("br", more)
         const activateButton = addEl("button", more, {
             className: "blue button",
             innerHTML: "Activate Steal",

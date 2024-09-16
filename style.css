@@ -135,7 +135,8 @@ input[type=text] {
     text-align: left;
 }
 
-#logout {
+#logout,
+#notif {
     margin: 1rem auto;
 }
 
