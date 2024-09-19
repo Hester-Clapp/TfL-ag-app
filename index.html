@@ -40,6 +40,10 @@
     </main>
 </body>
 <script>
+    const ws = new WebSocket(`${window.location.protocol.includes("s") ? "wss" : "ws"}://${window.location.host}/ws`)
+
+    // Steal notifications
+
     // Get team from local storage or log in
     const team = localStorage.getItem("team")
     if (!team) window.location.href = "/login"

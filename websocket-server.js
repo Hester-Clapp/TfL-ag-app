@@ -10,147 +10,118 @@ const pages = {
     "/teams.json": "./teams.json",
     "/challenges.json": "./challenges.json",
     "/steals.json": "./steals.json",
-};
+}
 
+const actions = {
+    login: async (ws, data) => {
+        const teams = await open("teams")
+        if (!(data.team in teams)) {
+            console.log(`Adding ${data.team} to database`)
+            teams[data.team] = {
+                coins: 1000,
+                bank: 0,
+            }
+            write("teams", teams)
+            ws.publish("log", `${data.team} has joined`)
+        }
+        ws.send(data.team)
+        // return Response.json({ team }, { status: 201 });
+    },
+    deposit: async (ws, data) => {
+        const teams = await open("teams")
+        let status, teamData
+        if (data.team in teams) {
+            teamData = teams[data.team]
+            if (teamData.coins - data.amount >= 0 && teamData.bank + data.amount >= 0) {
+                status = 200
+                teamData.coins -= data.amount
+                teamData.bank += data.amount
+            } else status = 400
+            teams[data.team] = teamData
+        } else status = 401
+        write("teams", teams)
+        ws.publish("log", `${data.team} deposited money at the bank`)
+        ws.send(JSON.stringify(teamData))
+        // return Response.json(teamData, { status })
+    },
+    claim: async (ws, data) => {
+        const teams = await open("teams")
+        const challenges = await open("challenges")
+        if (data.team in teams) {
 
-// HTTP server setup
+            // Close the challenge
+            const challenge = challenges.locational.concat(challenges.nonlocational)
+                .filter(v => v.title === data.challenge)[0]
+            challenge.open = false
+            write("challenges", challenges)
+
+            // Update team coins
+            teams[data.team].coins += challenge.reward
+            write("teams", teams)
+            ws.publish("log", `${data.team} claimed the challenge '${data.challenge}'`)
+            return new Response("Claim succesful!", { status: 200 })
+        } else {
+            return new Response("Team invalid, redirecting...", { status: 401 })
+        }
+    },
+    purchase_token: async (ws, data) => {
+        const teams = await open("teams")
+        const steals = await open("steals")
+        if (data.team in teams) {
+            const steal = steals.filter(v => v.title === data.steal)[0]
+
+            // Update team coins
+            teams[data.team].coins -= steal.cost
+            write("teams", teams)
+
+            // Change the owner of the steal token
+            steal.owner = data.team
+            write("steals", steals)
+            ws.publish("log", `${data.team} purchased the steal token '${data.steal}'`)
+            return new Response("Purchase succesful!", { status: 200 })
+        } else {
+            return new Response("Team invalid, redirecting...", { status: 401 })
+        }
+    }
+}
+
 const server = Bun.serve({
     port: 8080,
-    async fetch(req) {
-        const url = new URL(req.url);
-
-        if (req.method === "GET" && url.pathname in pages) {
-            console.log(`Serving ${url.pathname}`);
-            return new Response(Bun.file(pages[url.pathname]));
-        }
-
-        return new Response("Page not found", { status: 404 });
-    },
-});
-
-// Create a WebSocket server
-// const wss = new WebSocket.Server({ port: 8081 });
-const wss = Bun.serve({
     fetch(req, server) {
+        const url = new URL(req.url)
+        // let cookies = (req.headers.get('cookie') || '').split(';')
+        // let username = 'Unknown'
+        // for (let pair of cookies) {
+        //     let [key, value] = pair.split('=')
+        //     if (key === 'username') username = value
+        // }
+        if (req.method === "GET" && url.pathname in pages) {
+            console.log(`Serving ${url.pathname}`)
+            return new Response(Bun.file(pages[url.pathname]))
+        }
         if (server.upgrade(req)) return
-        return new Response("Could not establish websocket connection.")
+        return new Response("404 - Page not found", { status: 404 })
     },
     websocket: {
-
-        // WebSocket connection handling
         open(ws) {
-            console.log("New WebSocket client connected");
+            ws.subscribe('log')
+            ws.subscribe('steals')
         },
-
-        async message(ws, message) {
-            const data = JSON.parse(message);
-            // Handle incoming messages based on the action type
-            if (data.action === "login") {
-                await handleLogin(data.team, ws);
-            } else if (data.action === "deposit") {
-                await handleDeposit(data, ws);
-            } else if (data.action === "claim") {
-                await handleClaim(data, ws);
-            } else if (data.action === "purchase_token") {
-                await handlePurchaseToken(data, ws);
-            }
+        message(ws, data) {
+            const json = JSON.parse(data)
+            actions[json.actions](ws, json.data)
         },
-
         close(ws) {
-            console.log("WebSocket client disconnected");
+            ws.unsubscribe('log')
+            ws.unsubscribe('steals')
         }
-
-
     }
+
+    /*
+    return new Response("Page not found", { status: 404 });*/
 })
+console.log(`Server running on port ${server.port}`)
 
-
-console.log(`HTTP server running on port ${server.port}`);
-console.log(`WebSocket server running on port 8081`);
-
-async function handleLogin(team, ws) {
-    console.log(`Receiving login for team: ${team}`);
-    const teams = await open("teams");
-
-    if (!(team in teams)) {
-        console.log(`Adding ${team} to database`);
-        teams[team] = { coins: 1000, bank: 0 };
-        await write("teams", teams);
-        logEvent(`${team} has joined`);
-        ws.send(JSON.stringify({ status: 201, team }));
-    } else {
-        ws.send(JSON.stringify({ status: 409, message: "Team already exists" }));
-    }
-}
-
-async function handleDeposit(data, ws) {
-    const teams = await open("teams");
-    let status, teamData;
-
-    if (data.team in teams) {
-        teamData = teams[data.team];
-        if (teamData.coins - data.amount >= 0 && teamData.bank + data.amount >= 0) {
-            status = 200;
-            teamData.coins -= data.amount;
-            teamData.bank += data.amount;
-        } else {
-            status = 400;
-        }
-        teams[data.team] = teamData;
-    } else {
-        status = 401;
-    }
-
-    await write("teams", teams);
-    logEvent(`${data.team} deposited money at the bank`);
-    ws.send(JSON.stringify({ status, teamData }));
-}
-
-async function handleClaim(data, ws) {
-    const teams = await open("teams");
-    const challenges = await open("challenges");
-
-    if (data.team in teams) {
-        const challenge = challenges.local.concat(challenges.nonlocal).filter(v => v.title === data.challenge)[0];
-        challenge.open = false;
-        await write("challenges", challenges);
-        teams[data.team].coins += challenge.reward;
-        await write("teams", teams);
-        logEvent(`${data.team} claimed the challenge '${data.challenge}'`);
-        ws.send(JSON.stringify({ status: 200, message: "Claim successful!" }));
-    } else {
-        ws.send(JSON.stringify({ status: 401, message: "Team invalid, redirecting..." }));
-    }
-}
-
-async function handlePurchaseToken(data, ws) {
-    const teams = await open("teams");
-    const steals = await open("steals");
-
-    if (data.team in teams) {
-        const steal = steals.find(v => v.title === data.steal);
-        teams[data.team].coins -= steal.cost;
-        await write("teams", teams);
-        steal.owner = data.team;
-        await write("steals", steals);
-        logEvent(`${data.team} purchased the steal token '${data.steal}'`);
-        ws.send(JSON.stringify({ status: 200, message: "Purchase successful!" }));
-    } else {
-        ws.send(JSON.stringify({ status: 401, message: "Team invalid, redirecting..." }));
-    }
-}
-
-async function open(path) {
-    return Bun.file(`./${path}.json`).json();
-}
-
-async function write(path, data) {
-    await Bun.write(`./${path}.json`, JSON.stringify(data));
-}
-
-async function logEvent(event) {
-    const log = await open("log");
-    const newLog = [`${new Date().toTimeString().slice(0, 5)}: ${event}`].concat(log);
-    await write("log", newLog);
-}
-
+function open(path) { return Bun.file(`./${path}.json`).json() }
+function write(path, data) { Bun.write(`./${path}.json`, JSON.stringify(data)) }
+function logEvent(event) { open("log").then(log => [`${new Date().toTimeString().slice(0, 5)}: ${event}`].concat(log)).then(log => write("log", log)) }
